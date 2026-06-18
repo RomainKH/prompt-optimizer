@@ -8,15 +8,15 @@ The table below uses **everyday, conversational prompts** (the way people actual
 
 | # | Severity | Before (raw prompt) | After (optimized) | Tokens | Savings |
 |---|----------|---------------------|-------------------|--------|---------|
-| 1 | Normal | *"salut, est-ce que tu pourrais m'aider à écrire une fonction python qui lit un csv et qui me sort la moyenne d'une colonne stp ? c'est un peu urgent pour le boulot merci beaucoup"* | "Écris une fonction Python qui lit un CSV et calcule la moyenne d'une colonne." | 42 → 17 | **-59.5%** |
-| 2 | Normal | *"coucou, je me demandais si tu pouvais regarder mon code et me dire pourquoi ça plante, en gros j'ai une erreur null quelque part mais je trouve pas, ça m'aiderait vraiment merci d'avance"* | "Analyse ce code et identifie la cause de l'erreur null." | 46 → 14 | **-69.6%** |
-| 3 | Aggressive | *"hey du coup j'aimerais bien que tu me fasses un petit script bash pour backup mes fichiers tous les jours si possible, enfin si c'est pas trop compliqué bien sûr, merci !"* | "Écris un script bash qui sauvegarde mes fichiers quotidiennement." | 42 → 16 | **-61.9%** |
-| 4 | Aggressive | *"yo est-ce que tu peux me write une fonction qui parse le json et qui gère bien les erreurs stp, c'est important pour mon projet merci"* | "Write a function to parse JSON with error handling." | 32 → 12 | **-62.5%** |
-| 5 | Normal | *"bonjour, j'ai vraiment besoin que tu m'expliques en détail comment marche les promesses en javascript parce que je suis un peu perdu et c'est pour mon cours, merci d'avance c'est gentil"* | "Explique le fonctionnement des promesses en JavaScript." | 45 → 16 | **-64.4%** |
+| 1 | Normal | *"tu peux regarder pourquoi mon build passe pas, j'ai un truc bizarre avec les imports du coup ça compile pas"* | "Identifie pourquoi le build échoue (erreur d'imports)." | 24 → 15 | **-37.5%** |
+| 2 | Normal | *"du coup faut que je refacto cette fonction elle est beaucoup trop longue, tu peux m'aider à la découper un peu"* | "Refactore cette fonction trop longue en la découpant." | 26 → 14 | **-46.2%** |
+| 3 | Normal | *"juste un truc vite fait, tu peux me faire une regex qui valide un email stp"* | "Écris une regex qui valide un email." | 17 → 8 | **-52.9%** |
+| 4 | Aggressive | *"ok donc en gros j'aimerais bien que tu m'écrives un endpoint express qui récupère les users depuis la db"* | "Écris un endpoint Express qui récupère les users depuis la DB." | 26 → 14 | **-46.2%** |
+| 5 | Normal | *"par contre faudrait que tu check ce code, je pense qu'il y a une fuite mémoire quelque part mais je suis pas sûr"* | "Analyse ce code pour détecter une fuite mémoire." | 26 → 10 | **-61.5%** |
 
-**Total: 207 → 75 tokens — an average of `-63.8%` across 5 realistic prompts.**
+**Total: 119 → 61 tokens — an average of `-48.7%` across 5 realistic prompts.**
 
-> 💡 Savings compound over a session — at ~26 tokens saved per prompt, a user who sends 50 prompts/day saves **~1,300 tokens daily** with no loss of intent.
+> 💡 Savings compound over a session — at ~12 tokens saved per prompt, a developer who sends 50 prompts/day saves **~580 tokens daily** with no loss of intent.
 
 ### 🔬 Reproduce these numbers
 
@@ -26,10 +26,10 @@ The figures above are produced by the same `estimateTokens` / `calculateCompress
 // bench.cjs
 const { calculateCompression } = require('./scripts/auto_learn.cjs');
 const r = calculateCompression(
-  "salut, est-ce que tu pourrais m'aider à écrire une fonction python qui lit un csv et qui me sort la moyenne d'une colonne stp ? c'est un peu urgent pour le boulot merci beaucoup",
-  "Écris une fonction Python qui lit un CSV et calcule la moyenne d'une colonne."
+  "tu peux regarder pourquoi mon build passe pas, j'ai un truc bizarre avec les imports du coup ça compile pas",
+  "Identifie pourquoi le build échoue (erreur d'imports)."
 );
-console.log(r); // { saved: 25, ratio: '59.5', originalTokens: 42, optimizedTokens: 17 }
+console.log(r); // { saved: 9, ratio: '37.5', originalTokens: 24, optimizedTokens: 15 }
 ```
 
 ```bash
