@@ -1,0 +1,67 @@
+name: Release Skill
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '.github/**'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Increment Version
+        id: versioning
+        run: |
+          VERSION=$(cat version.txt)
+          IFS='.' read -r major minor patch <<< "$VERSION"
+          NEW_PATCH=$((patch + 1))
+          NEW_VERSION="$major.$minor.$NEW_PATCH"
+          echo "$NEW_VERSION" > version.txt
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add version.txt
+          git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+
+      - name: Package Skill
+        run: |
+          # On simule la structure minimale du skill-creator pour le packaging
+          # ou on utilise zip directement pour créer le .skill
+          zip -r prompt-optimizer.skill . -x "*.git*" ".github*" "prompt-optimizer.skill"
+
+      - name: Push version bump
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.versioning.outputs.new_version }}
+          name: Release v${{ steps.versioning.outputs.new_version }}
+          files: prompt-optimizer.skill
+          body: |
+            Automated release for version ${{ steps.versioning.outputs.new_version }}.
+            Install using:
+            ```bash
+            curl -sSL https://raw.githubusercontent.com/RomainKH/prompt-optimizer/main/install.sh | bash
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
