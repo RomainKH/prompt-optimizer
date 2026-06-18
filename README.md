@@ -1,4 +1,4 @@
-# Prompt Optimizer Skill (V2)
+# Prompt Optimizer Skill (v1.0.0)
 
 An intelligent tool designed to strip away "prompt fluff" (politeness, fillers, and unnecessary context) to reduce token consumption and improve LLM instruction clarity.
 

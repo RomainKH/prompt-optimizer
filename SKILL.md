@@ -3,7 +3,7 @@ name: prompt-optimizer
 description: Optimizes user prompts by removing fluff (politeness, fillers, unnecessary context) to reduce token usage and improve clarity. Supports self-learning and compression stats.
 ---
 
-# Prompt Optimizer (V2)
+# Prompt Optimizer (v1.0.0)
 
 This skill transforms verbose user queries into direct, high-signal instructions for an AI.
 

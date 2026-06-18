@@ -3,11 +3,14 @@
 Ce document répertorie les segments de phrases inutiles qui peuvent être supprimés pour optimiser les tokens sans perdre l'intention.
 
 ## Français (FR)
-- **Politesse :** "s'il vous plaît", "s'il te plaît", "merci d'avance", "pourriez-vous", "est-ce que tu pourrais", "serait-il possible de", "je vous remercie".
-- **Hésitations/Introduction :** "je me demandais si", "je voulais savoir", "juste une petite question", "en fait", "je pense que", "salut", "bonjour".
-- **Vagues intensifieurs :** "soigneusement", "intelligemment", "profondément", "correctement", "précisément".
-- **Fausses formules :** "utilise toute ton intelligence", "sois un génie", "donne la réponse parfaite".
-- **Justifications inutiles :** "j'en ai vraiment besoin", "c'est pour mon travail", "je suis un peu perdu", "c'est très important".
+- **Politesse :** "s'il vous plaît", "s'il te plaît", "merci d'avance", "pourriez-vous", "est-ce que tu pourrais", "serait-il possible de", "je vous remercie", "je te remercie", "tu peux", "est-ce que tu peux".
+- **Abréviations :** "stp", "svp", "mrc", "bjr", "bsr", "dsl", "ajd", "cc", "bj", "tkt".
+- **Hésitations/Fillers :** "je me demandais si", "je voulais savoir", "juste une petite question", "en fait", "je pense que", "salut", "bonjour", "coucou", "dis moi", "est-ce que", "alors", "quand même", "genre", "tu vois", "tu sais", "en gros", "à la limite", "si possible", "donc", "bah", "euh".
+- **Méta-commentaires & Parenthèses :** "(...)", "par exemple", "entre parenthèses", "soit dit en passant", "tu vois ce que je veux dire", "je sais pas si c'est clair".
+- **Vagues intensifieurs :** "soigneusement", "intelligemment", "profondément", "correctement", "précisément", "vraiment", "très", "un peu", "pas mal", "tellement", "super", "hyper", "méga", "grave", "trop".
+- **Fausses formules :** "utilise toute ton intelligence", "sois un génie", "donne la réponse parfaite", "fais de ton mieux", "pense fort".
+- **Justifications inutiles :** "j'en ai vraiment besoin", "c'est pour mon travail", "je suis un peu perdu", "c'est très important", "pour mon projet", "urgent", "ça m'aiderait beaucoup".
+- **Conclusion/Remplissage :** "merci", "thx", "voilà", "c'est tout", "bonne journée", "bon courage", "à plus", "n'hésite pas".
 
 ## Anglais (EN)
 - **Politeness :** "please", "thank you", "would you mind", "could you possibly", "I would appreciate it if".
