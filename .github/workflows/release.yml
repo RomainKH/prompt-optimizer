@@ -1,12 +1,12 @@
 name: Release Skill
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'README.md'
-      - '.github/**'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.0.2)'
+        required: true
+        type: string
 
 jobs:
   release:
@@ -16,57 +16,59 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Increment Version
+      - name: Bump version in all files
         id: versioning
         run: |
-          VERSION=$(cat version.txt)
-          IFS='.' read -r major minor patch <<< "$VERSION"
-          NEW_PATCH=$((patch + 1))
-          NEW_VERSION="$major.$minor.$NEW_PATCH"
-          echo "$NEW_VERSION" > version.txt
-          
-          # Sync version in README and SKILL files
-          sed -i "s/v$VERSION/v$NEW_VERSION/g" README.md
-          sed -i "s/v$VERSION/v$NEW_VERSION/g" SKILL.md
-          
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          
+          VERSION="${{ github.event.inputs.version }}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Update version.txt
+          echo "$VERSION" > version.txt
+
+          # Update version in README.md and SKILL.md titles: (v1.0.1) → (v1.0.2)
+          sed -i "s/(v[0-9]*\.[0-9]*\.[0-9]*)/(v$VERSION)/g" README.md
+          sed -i "s/(v[0-9]*\.[0-9]*\.[0-9]*)/(v$VERSION)/g" SKILL.md
+
+          # Update version in install scripts (plugin.json version field)
+          sed -i "s/\"version\": \"[0-9]*\.[0-9]*\.[0-9]*\"/\"version\": \"$VERSION\"/g" install-antigravity.sh
+
+          # Commit and push
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add version.txt README.md SKILL.md
-          git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: bump version to v$VERSION [skip ci]"
+          git push
 
       - name: Package Skill
         run: |
-          # On simule la structure minimale du skill-creator pour le packaging
-          # ou on utilise zip directement pour créer le .skill
           zip -r prompt-optimizer.skill . -x "*.git*" ".github*" "prompt-optimizer.skill"
 
-      - name: Push version bump
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+      - name: Create Git Tag
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.versioning.outputs.new_version }}
-          name: Release v${{ steps.versioning.outputs.new_version }}
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release v${{ github.event.inputs.version }}
           files: prompt-optimizer.skill
           body: |
-            Automated release for version ${{ steps.versioning.outputs.new_version }}.
-            Install using:
-            ```bash
-            curl -sSL https://raw.githubusercontent.com/RomainKH/prompt-optimizer/main/install.sh | bash
-            ```
+            ## 🚀 Install in one line
+
+            | Platform | Command |
+            |----------|---------|
+            | **Gemini CLI** | `curl -sSL https://raw.githubusercontent.com/RomainKH/prompt-optimizer/main/install.sh \| bash` |
+            | **Antigravity IDE** | `curl -sSL https://raw.githubusercontent.com/RomainKH/prompt-optimizer/main/install-antigravity.sh \| bash` |
+            | **Claude Code** | `curl -sSL https://raw.githubusercontent.com/RomainKH/prompt-optimizer/main/install-claude.sh \| bash` |
+            | **Cursor** | `curl -sSL https://raw.githubusercontent.com/RomainKH/prompt-optimizer/main/install-cursor.sh \| bash` |
+            | **GitHub Copilot** | `curl -sSL https://raw.githubusercontent.com/RomainKH/prompt-optimizer/main/install-copilot.sh \| bash` |
+            | **Windsurf** | `curl -sSL https://raw.githubusercontent.com/RomainKH/prompt-optimizer/main/install-windsurf.sh \| bash` |
+            | **ChatGPT** | `curl -sSL https://raw.githubusercontent.com/RomainKH/prompt-optimizer/main/install-chatgpt.sh \| bash` |
+
+            See the [README](https://github.com/RomainKH/prompt-optimizer#readme) for full setup instructions.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

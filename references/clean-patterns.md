@@ -1,26 +1,54 @@
-# Patterns de Nettoyage Multilingues
+# Multilingual Cleaning Patterns
 
-Ce document répertorie les segments de phrases inutiles qui peuvent être supprimés pour optimiser les tokens sans perdre l'intention.
+This document lists unnecessary phrase segments that can be removed to optimize token usage without losing intent. Each language section contains categories of fluff patterns.
 
-## Français (FR)
-- **Politesse :** "s'il vous plaît", "s'il te plaît", "merci d'avance", "pourriez-vous", "est-ce que tu pourrais", "serait-il possible de", "je vous remercie", "je te remercie", "tu peux", "est-ce que tu peux".
-- **Abréviations :** "stp", "svp", "mrc", "bjr", "bsr", "dsl", "ajd", "cc", "bj", "tkt".
-- **Hésitations/Fillers :** "je me demandais si", "je voulais savoir", "juste une petite question", "en fait", "je pense que", "salut", "bonjour", "coucou", "dis moi", "est-ce que", "alors", "quand même", "genre", "tu vois", "tu sais", "en gros", "à la limite", "si possible", "donc", "bah", "euh".
-- **Méta-commentaires & Parenthèses :** "(...)", "par exemple", "entre parenthèses", "soit dit en passant", "tu vois ce que je veux dire", "je sais pas si c'est clair".
-- **Vagues intensifieurs :** "soigneusement", "intelligemment", "profondément", "correctement", "précisément", "vraiment", "très", "un peu", "pas mal", "tellement", "super", "hyper", "méga", "grave", "trop".
-- **Fausses formules :** "utilise toute ton intelligence", "sois un génie", "donne la réponse parfaite", "fais de ton mieux", "pense fort".
-- **Justifications inutiles :** "j'en ai vraiment besoin", "c'est pour mon travail", "je suis un peu perdu", "c'est très important", "pour mon projet", "urgent", "ça m'aiderait beaucoup".
-- **Conclusion/Remplissage :** "merci", "thx", "voilà", "c'est tout", "bonne journée", "bon courage", "à plus", "n'hésite pas".
+## Language Detection Markers
 
-## Anglais (EN)
-- **Politeness :** "please", "thank you", "would you mind", "could you possibly", "I would appreciate it if".
-- **Fillers/Intro :** "I was wondering if", "I'm looking for", "can you help me with", "actually", "basically", "literally", "just".
-- **Vague Intensifiers :** "carefully", "accurately", "smartly", "deeply", "properly".
-- **Fake Power Words :** "use your full intelligence", "think like a genius", "give the perfect answer".
-- **Unnecessary context :** "I'm working on a project", "it would be great if", "just wanted to ask", "it's very important".
+Use these markers to identify the input language before selecting the appropriate section:
 
-## Espagnol (ES)
-- **Polite/Intro :** "por favor", "gracias", "me gustaría saber si", "¿podrías ayudarme a?", "quería preguntarte".
+| Language | Key Markers | Unique Characters |
+|----------|------------|-------------------|
+| French (FR) | je, tu, que, est-ce, le/la/les, un/une, du, des, qui, nous, vous | é, è, ê, ë, à, ù, ç, ô, î, û |
+| English (EN) | the, is, are, I, you, can, would, this, that, have, do | — |
+| Spanish (ES) | el/la/los/las, que, es, yo, tú, usted, nosotros, pero, también | ñ, ¿, ¡, á, í, ó, ú |
+| Italian (IT) | il/lo/la/i/gli/le, che, è, sono, mi, questo, anche, perché | — (overlap with FR accents) |
 
-## Italien (IT)
-- **Polite/Intro :** "per favore", "grazie", "mi chiedevo se", "potresti aiutarmi a", "vorrei sapere".
+## French (FR)
+- **Politeness:** "s'il vous plaît", "s'il te plaît", "merci d'avance", "pourriez-vous", "pourrais-tu", "peux-tu", "est-ce que tu pourrais", "serait-il possible de", "est-ce que ce serait possible de", "je vous remercie", "je te remercie", "tu peux", "est-ce que tu peux", "auriez-vous", "j'aimerais que tu", "j'aimerais bien que tu", "j'aurais besoin que tu", "ce serait gentil de", "ça te dérange de", "si ça te dérange pas".
+- **Abbreviations:** "stp", "svp", "mrc", "bjr", "bsr", "dsl", "ajd", "auj", "cc", "bj", "tkt", "slt", "bcp", "tjs", "tjrs", "pk", "pq", "qd", "qqch", "qqn", "jsp", "jpp", "mdr", "ptdr", "vrmt", "rdv".
+- **Hesitations/Fillers:** "je me demandais si", "je voulais savoir", "juste une petite question", "en fait", "je pense que", "salut", "bonjour", "coucou", "hey", "yo", "wesh", "dis moi", "est-ce que", "alors", "quand même", "genre", "tu vois", "tu sais", "en gros", "à la limite", "si possible", "donc", "bah", "ben", "euh", "du coup", "en vrai", "bref", "j'avoue", "à vrai dire", "franchement", "honnêtement", "perso", "eh bien", "ouais", "comment dire", "enfin".
+- **Meta-comments & Parentheticals:** "(...)", "par exemple", "entre parenthèses", "soit dit en passant", "tu vois ce que je veux dire", "si tu vois ce que je veux dire", "enfin tu vois", "je sais pas si c'est clair", "pour info", "au cas où", "histoire de".
+- **Vague Intensifiers:** "soigneusement", "intelligemment", "profondément", "correctement", "précisément", "vraiment", "très", "un peu", "pas mal", "tellement", "super", "hyper", "méga", "grave", "trop", "carrément", "vachement", "à fond", "extrêmement", "absolument", "totalement", "complètement", "particulièrement".
+- **Fake Power Phrases:** "utilise toute ton intelligence", "utilise tout ton savoir", "sois un génie", "donne la réponse parfaite", "fais de ton mieux", "pense fort", "réfléchis bien", "réfléchis étape par étape", "prends ton temps", "sois précis", "sois créatif", "agis comme un expert", "comporte-toi comme un expert".
+- **Unnecessary Justifications:** "j'en ai vraiment besoin", "c'est pour mon travail", "c'est pour le boulot", "je suis un peu perdu", "c'est très important", "pour mon projet", "pour mes études", "pour mon cours", "urgent", "c'est urgent", "ça presse", "ça m'aiderait beaucoup", "j'ai pas beaucoup de temps", "je galère avec ça", "c'est pour demain", "pour mon patron".
+- **Closing/Filler:** "merci", "merci beaucoup", "merci bien", "thx", "voilà", "c'est tout", "bonne journée", "bonne soirée", "bon courage", "à plus", "à bientôt", "à toute", "n'hésite pas", "cordialement", "bien à toi", "tiens-moi au courant", "dis-moi si besoin".
+
+## English (EN)
+- **Politeness:** "please", "thank you", "thanks", "thank you so much", "thanks a lot", "thanks in advance", "would you mind", "could you possibly", "could you please", "I would appreciate it if", "I'd really appreciate", "if you don't mind", "if it's not too much trouble", "would it be possible to", "can you", "could you", "would you be able to", "I was hoping you could", "do you think you could", "it would be nice if", "kindly", "if possible", "when you get a chance", "whenever you can", "I'd be grateful if", "would you kindly", "any chance you could", "mind helping me".
+- **Abbreviations/Slang:** "thx", "ty", "tysm", "pls", "plz", "tbh", "imo", "imho", "ngl", "idk", "idc", "lol", "lmao", "omg", "btw", "fyi", "brb", "nvm", "smh", "fr", "rn", "iirc", "afaik", "np", "k", "kk", "ok so", "ya", "yea", "yeah", "yep", "nah", "aight", "u", "ur", "cuz", "thnx", "abt".
+- **Hesitations/Fillers:** "I was wondering if", "I'm looking for", "I just wanted to", "just wanted to ask", "quick question", "so basically", "actually", "basically", "literally", "just", "like", "you know", "I mean", "right", "so", "well", "um", "uh", "hmm", "let me think", "okay so", "here's the thing", "the thing is", "to be honest", "honestly", "I guess", "I suppose", "sort of", "kind of", "kinda", "pretty much", "anyway", "anyways", "look", "listen", "alright", "I dunno", "or something", "and stuff", "you see".
+- **Meta-comments & Parentheticals:** "(...)", "for example", "in parentheses", "by the way", "on a side note", "you know what I mean", "if that makes sense", "does that make sense", "I hope that's clear", "hope that makes sense", "not sure if I'm explaining this right", "sorry if this is confusing", "let me rephrase", "in other words", "long story short", "if you catch my drift".
+- **Vague Intensifiers:** "carefully", "accurately", "smartly", "deeply", "properly", "precisely", "correctly", "thoroughly", "really", "very", "extremely", "super", "incredibly", "absolutely", "totally", "completely", "quite", "rather", "fairly", "a bit", "a little", "somewhat", "seriously", "pretty", "highly", "truly", "definitely", "certainly", "obviously", "clearly", "particularly", "especially".
+- **Fake Power Phrases:** "use your full intelligence", "think like a genius", "give the perfect answer", "be as accurate as possible", "think step by step", "take your time", "think hard", "be creative", "use all your knowledge", "give me the best answer", "act like an expert", "pretend you're a senior developer", "imagine you're the best in the world", "you are an expert", "as an expert", "you're the best", "leave no stone unturned", "be thorough", "don't make any mistakes", "give it your all".
+- **Unnecessary Justifications:** "I'm working on a project", "it would be great if", "it's very important", "it's for work", "I really need this", "I'm a bit lost", "I'm stuck on this", "this is urgent", "it would help me a lot", "for my assignment", "for my homework", "for my thesis", "for a client", "for my boss", "my manager asked me to", "I've been struggling with", "I need this ASAP", "deadline is tomorrow", "I'm new to this", "I'm a beginner", "it's time-sensitive".
+- **Closing/Filler:** "thanks", "thank you", "cheers", "appreciate it", "that's all", "that's it", "have a good day", "have a nice day", "good luck", "take care", "best regards", "feel free to", "don't hesitate to", "let me know if you need anything", "looking forward to your response", "hope this helps", "thanks again", "many thanks", "much appreciated", "in advance", "you're a lifesaver".
+
+## Spanish (ES)
+- **Politeness:** "por favor", "porfavor", "gracias", "muchas gracias", "gracias de antemano", "¿podrías", "¿podrías ayudarme a?", "me podrías ayudar", "¿serías tan amable de", "¿te importaría", "si no es mucha molestia", "si fueras tan amable", "si pudieras", "cuando puedas", "te lo agradecería", "te agradecería mucho", "se lo agradecería", "le agradezco", "¿puedes", "¿me podrías", "sería posible", "¿sería posible", "amablemente".
+- **Abbreviations/Slang:** "porfa", "pf", "xfa", "grax", "thx", "ntp", "tqm", "x", "xq", "pq", "tb", "tmb", "dnd", "msj", "q", "d", "bn", "bno", "salu2", "xd", "jaja", "jeje".
+- **Hesitations/Fillers:** "me gustaría saber si", "quería preguntarte", "es que", "la verdad es que", "bueno", "pues", "a ver", "o sea", "digamos", "mira", "oye", "la cosa es que", "resulta que", "es que quería", "hola", "buenas", "qué tal", "te cuento", "fíjate que", "no sé si", "básicamente", "en realidad", "de hecho", "sabes", "¿me entiendes?", "¿sabes?", "tipo", "en plan", "pues nada".
+- **Meta-comments & Parentheticals:** "(...)", "por ejemplo", "entre paréntesis", "por cierto", "dicho sea de paso", "¿me explico?", "no sé si me explico", "espero que se entienda", "a lo que voy es".
+- **Vague Intensifiers:** "cuidadosamente", "inteligentemente", "profundamente", "correctamente", "precisamente", "realmente", "muy", "un poco", "bastante", "demasiado", "súper", "mega", "re", "bien", "totalmente", "completamente", "verdaderamente", "increíblemente", "absolutamente", "sumamente", "particularmente", "especialmente".
+- **Fake Power Phrases:** "usa toda tu inteligencia", "usa todo tu conocimiento", "piensa como un genio", "piensa paso a paso", "dame la respuesta perfecta", "haz lo mejor que puedas", "sé lo más preciso posible", "tómate tu tiempo", "sé creativo", "actúa como un experto", "compórtate como un experto".
+- **Unnecessary Justifications:** "lo necesito de verdad", "es para mi trabajo", "estoy un poco perdido", "es muy importante", "para mi proyecto", "para mi tarea", "para la universidad", "para mi tesis", "urgente", "lo necesito ya", "es para hoy", "me ayudaría mucho", "tengo que entregarlo mañana", "no tengo mucho tiempo", "llevo rato con esto".
+- **Closing/Filler:** "gracias", "muchas gracias", "vale", "eso es todo", "buen día", "saludos", "un saludo", "saludos cordiales", "un abrazo", "atentamente", "cuídate", "nos vemos", "no dudes en", "espero tu respuesta", "quedo atento", "gracias de nuevo".
+
+## Italian (IT)
+- **Politeness:** "per favore", "grazie", "grazie mille", "grazie in anticipo", "ti ringrazio", "la ringrazio", "potresti", "potresti aiutarmi a", "saresti così gentile da", "saresti gentile", "ti dispiacerebbe", "se non è troppo disturbo", "se possibile", "se puoi", "quando puoi", "puoi", "mi potresti", "mi faresti", "sarebbe possibile", "gentilmente", "ti pregherei".
+- **Abbreviations/Slang:** "pfv", "grz", "thx", "cmq", "nn", "xché", "xò", "tt", "qlc", "msg", "risp", "tvb", "ke", "x", "sn", "dp", "qnd", "anke", "dv", "cs".
+- **Hesitations/Fillers:** "mi chiedevo se", "vorrei sapere", "volevo chiederti", "in realtà", "praticamente", "in pratica", "diciamo", "allora", "dunque", "cioè", "tipo", "sai", "guarda", "senti", "la cosa è che", "il fatto è che", "ciao", "buongiorno", "salve", "scusa", "scusami", "ecco", "insomma", "boh", "mah", "eh", "comunque", "ad ogni modo", "appunto".
+- **Meta-comments & Parentheticals:** "(...)", "per esempio", "ad esempio", "tra parentesi", "a proposito", "detto tra noi", "mi spiego?", "non so se mi spiego", "spero sia chiaro", "capisci cosa intendo".
+- **Vague Intensifiers:** "attentamente", "accuratamente", "intelligentemente", "profondamente", "correttamente", "precisamente", "davvero", "molto", "un po'", "abbastanza", "troppo", "veramente", "assolutamente", "completamente", "totalmente", "mega", "super", "particolarmente", "estremamente", "incredibilmente".
+- **Fake Power Phrases:** "usa tutta la tua intelligenza", "usa tutta la tua conoscenza", "pensa come un genio", "pensa passo passo", "dammi la risposta perfetta", "fai del tuo meglio", "sii il più preciso possibile", "prenditi il tempo", "sii creativo", "comportati come un esperto", "comportati da esperto".
+- **Unnecessary Justifications:** "ne ho davvero bisogno", "è per il mio lavoro", "per lavoro", "sono un po' perso", "è molto importante", "per il mio progetto", "per i miei studi", "per l'università", "urgente", "mi serve subito", "mi aiuterebbe molto", "devo consegnarlo domani", "è per domani".
+- **Closing/Filler:** "grazie", "grazie mille", "grazie ancora", "ecco", "è tutto", "buona giornata", "a presto", "ci vediamo", "non esitare a", "saluti", "un saluto", "cordiali saluti", "distinti saluti", "in attesa di risposta", "resto in attesa".
