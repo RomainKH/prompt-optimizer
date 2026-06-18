@@ -1,6 +1,6 @@
 # Prompt Optimizer Skill (v1.1.0)
 
-An intelligent skill that strips "prompt fluff" (politeness, fillers, unnecessary context) to reduce token consumption and improve LLM instruction clarity. Self-learning, multi-platform, multilingual.
+An intelligent skill that strips "prompt fluff" (politeness, fillers, unnecessary context) to reduce token consumption and improve LLM instruction clarity. Self-learning, multi-platform, multilingual (**English, French, Spanish, Italian**).
 
 ## 📉 Performance — real prompts, measured before/after
 
