@@ -1,0 +1,9 @@
+{
+  "name": "prompt-optimizer",
+  "version": "1.2.0",
+  "description": "Strips prompt fluff to cut token usage while preserving intent. Self-learning, multilingual.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test"
+  }
+}

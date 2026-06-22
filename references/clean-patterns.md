@@ -2,6 +2,8 @@
 
 This document lists unnecessary phrase segments that can be removed to optimize token usage without losing intent. Each language section contains categories of fluff patterns.
 
+> ⚠️ **Not all categories are equal.** *Politeness, Abbreviations, Hesitations/Fillers, Vague Intensifiers, Closing/Filler* are pure noise — safe to remove at `normal`. *Unnecessary Justifications* is **lossy context** ("it's for my boss", "c'est urgent") that can change tone/intent, and *Meta-comments & Parentheticals* may wrap technical detail — both are removed **only at `aggressive`**. See the severity table in [SKILL.md](../SKILL.md).
+
 ## Language Detection Markers
 
 Use these markers to identify the input language before selecting the appropriate section:

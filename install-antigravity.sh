@@ -23,7 +23,7 @@ cat > "$PLUGIN_DIR/plugin.json" << 'EOF'
 {
   "name": "prompt-optimizer",
   "description": "Optimizes user prompts by removing fluff to reduce token usage and improve clarity. Features self-learning with auto-promotion.",
-  "version": "1.1.0"
+  "version": "1.2.0"
 }
 EOF
 

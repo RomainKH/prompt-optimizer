@@ -167,10 +167,15 @@ function loadPatterns() {
 
 // Severity levels define which categories to remove
 // 'learned' = auto-promoted words; always active since they were confirmed fluff.
+//
+// Note: 'unnecessary justifications' is intentionally NOT in `normal`. Phrases
+// like "c'est pour mon patron" or "it's urgent" are lossy context, not pure
+// fluff — they can legitimately change tone/intent — so they are only stripped
+// in `aggressive`, where the user has opted into maximum compression.
 const SEVERITY_CATEGORIES = {
     light: ['politeness', 'abbreviations', 'abbreviations/slang', 'closing/filler', 'learned'],
     normal: ['politeness', 'abbreviations', 'abbreviations/slang', 'hesitations/fillers',
-             'closing/filler', 'vague intensifiers', 'unnecessary justifications', 'learned'],
+             'closing/filler', 'vague intensifiers', 'learned'],
     aggressive: ['politeness', 'abbreviations', 'abbreviations/slang', 'hesitations/fillers',
                  'closing/filler', 'vague intensifiers', 'unnecessary justifications',
                  'fake power phrases', 'meta-comments & parentheticals', 'learned']
@@ -186,7 +191,11 @@ function detectLanguage(text) {
     [' je ', ' tu ', ' que ', 'est-ce', ' le ', ' la ', ' les ', ' un ', ' une ', ' du ', ' des ', ' nous ', ' vous '].forEach(m => {
         if (lower.includes(m)) scores.fr += 2;
     });
-    if (/[éèêëàùçôîû]/.test(lower)) scores.fr += 3;
+    // Accents UNIQUE to French (Italian never uses ê ë ç î ô û) → strong FR signal.
+    if (/[êëçîôû]/.test(lower)) scores.fr += 3;
+    // Accents shared by FR and IT (é è à ù) → small, EQUAL boost so accented
+    // Italian (e.g. "perché", "è") is no longer misclassified as French.
+    if (/[éèàù]/.test(lower)) { scores.fr += 1; scores.it += 1; }
 
     // English markers
     [' the ', ' is ', ' are ', ' you ', ' can ', ' would ', ' this ', ' have ', ' do ', ' my '].forEach(m => {
@@ -200,8 +209,11 @@ function detectLanguage(text) {
     });
     if (/[ñ¿¡]/.test(lower)) scores.es += 3;
 
-    // Italian markers
-    [' il ', ' lo ', ' gli ', ' che ', ' sono ', ' questo ', ' anche ', ' perché ', ' della '].forEach(m => {
+    // Italian markers — content words mirror the ES approach so Italian can
+    // compete on its own merits instead of relying on (shared) accents.
+    [' il ', ' lo ', ' gli ', ' che ', ' sono ', ' questo ', ' anche ', ' perché ', ' della ',
+     ' come ', ' cosa ', ' molto ', ' fare ', ' puoi ',
+     'ciao', 'grazie', 'vorrei', 'potresti', 'voglio', 'scusa', 'aiutami'].forEach(m => {
         if (lower.includes(m)) scores.it += 2;
     });
 
@@ -225,6 +237,7 @@ function cmdLog(original, optimized, removed) {
     const log = loadLog();
     const compression = calculateCompression(original, optimized);
     const whitelist = loadWhitelist();
+    const langs = detectLanguage(original);
 
     // Filter out whitelisted words
     const filtered = removed.filter(w => !whitelist.includes(w.toLowerCase().trim()));
@@ -233,18 +246,27 @@ function cmdLog(original, optimized, removed) {
         const key = word.toLowerCase().trim();
         if (!key) return;
         if (!log.stats[key]) {
-            log.stats[key] = { count: 0, lastSeen: null };
+            log.stats[key] = { count: 0, lastSeen: null, langs: [] };
         }
+        if (!log.stats[key].langs) log.stats[key].langs = [];
         log.stats[key].count += 1;
         log.stats[key].lastSeen = new Date().toISOString();
+        // Track which language(s) this word was removed from, so `promote` can
+        // tag it correctly instead of dumping it in the language-agnostic '*'
+        // bucket (which caused cross-language false positives).
+        langs.forEach(l => { if (!log.stats[key].langs.includes(l)) log.stats[key].langs.push(l); });
     });
 
     log.totalTokensSaved += compression.saved;
 
+    // Privacy: set PROMPT_OPTIMIZER_NO_HISTORY=1 to keep the aggregate stats and
+    // token counts but never persist the raw prompt text (which may contain
+    // secrets/PII) to disk.
+    const redact = !!process.env.PROMPT_OPTIMIZER_NO_HISTORY;
     log.history.push({
         date: new Date().toISOString(),
-        original,
-        optimized,
+        original: redact ? '[redacted]' : original,
+        optimized: redact ? '[redacted]' : optimized,
         removed: filtered,
         saved: compression.saved,
         ratio: compression.ratio
@@ -294,7 +316,15 @@ function cmdPromote(threshold) {
 
     const fromStats = Object.entries(log.stats)
         .filter(([word, data]) => data.count >= t && !log.promoted.includes(word))
-        .map(([word, data]) => ({ word, count: data.count, source: 'stats' }));
+        // A word seen in exactly one language gets tagged with it, so it is only
+        // ever applied to that language. Only words seen across multiple
+        // languages become truly language-agnostic ('*' bucket).
+        .map(([word, data]) => ({
+            word,
+            count: data.count,
+            lang: data.langs && data.langs.length === 1 ? data.langs[0] : undefined,
+            source: 'stats'
+        }));
 
     const fromCandidates = Object.entries(log.candidates)
         .filter(([word, data]) => data.count >= t && !log.promoted.includes(word))
@@ -332,6 +362,42 @@ function cmdPromote(threshold) {
         promoted.forEach(w => console.log(`   ✅ "${w}"`));
     } else {
         console.log(`\n✅ All candidates already in patterns.`);
+    }
+}
+
+function cmdDemote(phrase) {
+    const key = (phrase || '').toLowerCase().trim();
+    if (!key) { console.log('❌ Please provide the word or phrase to demote.'); return; }
+
+    const log = loadLog();
+    let changed = false;
+
+    // 1. Remove the auto-promoted line(s) for this word from clean-patterns.md.
+    if (fs.existsSync(PATTERNS_FILE)) {
+        const lines = fs.readFileSync(PATTERNS_FILE, 'utf8').split('\n');
+        const kept = lines.filter(line => {
+            const m = line.match(/^- "([^"]+)"/);
+            return !m || m[1].toLowerCase() !== key;
+        });
+        if (kept.length !== lines.length) {
+            fs.writeFileSync(PATTERNS_FILE, kept.join('\n'));
+            changed = true;
+        }
+    }
+
+    // 2. Forget it from the promoted list and reset its learned stats so it does
+    // not get auto-promoted again on the very next optimization.
+    const pIdx = log.promoted.indexOf(key);
+    if (pIdx !== -1) { log.promoted.splice(pIdx, 1); changed = true; }
+    if (log.stats[key]) { delete log.stats[key]; changed = true; }
+    if (log.candidates[key]) { delete log.candidates[key]; changed = true; }
+    saveLog(log);
+
+    if (changed) {
+        console.log(`\n↩️  Demoted "${key}". Removed from learned patterns and reset its stats.`);
+        console.log(`   Tip: run "whitelist add ${key}" if you never want it removed again.`);
+    } else {
+        console.log(`\nℹ️  "${key}" was not found in learned patterns or stats.`);
     }
 }
 
@@ -616,6 +682,14 @@ switch (command) {
         cmdPromote(args[0] ? parseInt(args[0], 10) : undefined);
         break;
     }
+    case 'demote': {
+        if (!args[0]) {
+            console.log('Usage: node auto_learn.cjs demote "<word_or_phrase>"');
+            process.exit(1);
+        }
+        cmdDemote(args.join(' '));
+        break;
+    }
     case 'stats': {
         cmdStats();
         break;
@@ -644,6 +718,7 @@ switch (command) {
         console.log('  log <original> <optimized> <removed...>     Log an optimization');
         console.log('  candidate <phrase> [lang]                    Log a suspected fluff word');
         console.log('  promote [threshold]                          Auto-add frequent words to patterns');
+        console.log('  demote <phrase>                              Undo a promotion (remove from patterns + reset)');
         console.log('  stats                                        Show usage statistics');
         console.log('  dry-run <text> [light|normal|aggressive]     Preview what would be removed');
         console.log('  whitelist add|remove|list [word]             Manage protected words');

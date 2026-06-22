@@ -1,10 +1,10 @@
-# Prompt Optimizer Skill (v1.1.0)
+# Prompt Optimizer Skill (v1.2.0)
 
 An intelligent skill that strips "prompt fluff" (politeness, fillers, unnecessary context) to reduce token consumption and improve LLM instruction clarity. Self-learning, multi-platform, multilingual (**English, French, Spanish, Italian**).
 
 ## 📉 Performance — real prompts, measured before/after
 
-The table below uses **everyday, conversational prompts** (the way people actually type — lowercase, run-on, polite, with justifications and abbreviations). Token counts are **measured by the skill's own estimator**, not estimated by hand — every row is reproducible (see [Reproduce these numbers](#-reproduce-these-numbers)).
+The table below uses **everyday, conversational prompts** (the way people actually type — lowercase, run-on, polite, with justifications and abbreviations). Token counts come from the skill's own **heuristic estimator** (a fast character/word approximation, not a true BPE tokenizer — so treat absolute counts as ballpark and the *relative* savings as the signal). Every row is reproducible (see [Reproduce these numbers](#-reproduce-these-numbers)).
 
 | # | Severity | Before (raw prompt) | After (optimized) | Tokens | Savings |
 |---|----------|---------------------|-------------------|--------|---------|
@@ -68,20 +68,24 @@ Pick your platform and run the command in your terminal:
 
 ## 🛠 Features
 
-- **3 Severity Levels** — `light`, `normal`, `aggressive` — control how much gets stripped.
+- **3 Severity Levels** — `light`, `normal`, `aggressive` — control how much gets stripped. Lossy context (justifications) is only touched at `aggressive`, so `normal` stays safe.
 - **Dry-Run Mode** — Preview what would be removed before committing.
 - **Whitelist** — Protect specific words from ever being removed.
-- **Self-Learning** — Tracks your patterns and auto-promotes frequent fluff to the reference list.
+- **Self-Learning** — Tracks your patterns and auto-promotes frequent fluff to the reference list. Made a bad promotion? `demote` undoes it.
 - **Stats Decay** — Old patterns lose weight over time, keeping the system relevant.
+- **Privacy Mode** — `PROMPT_OPTIMIZER_NO_HISTORY=1` keeps the stats but never writes raw prompt text to disk.
 - **Multilingual** — Pre-configured for EN, FR, ES, IT with 8 categories each.
 - **Mixed-Language** — Handles prompts written in multiple languages at once.
 - **Compression Stats** — Reports token savings for every optimization.
+- **Tested** — Pure helpers covered by a zero-dependency test suite: `npm test` (uses the built-in Node test runner).
 
 ---
 
 ## Contributions Needed! 🌍
 
-We want to make this tool truly global. If you can help add "fluff" patterns for other languages (**German, Japanese, Chinese, Arabic, etc.**), please open a Pull Request! Your contributions to `references/clean-patterns.md` are highly welcome.
+We want to make this tool truly global. If you can help add "fluff" patterns for other space-delimited languages (**German, Portuguese, Dutch, etc.**), please open a Pull Request to `references/clean-patterns.md` — they work out of the box.
+
+> ⚠️ **Note on CJK / non-spaced scripts.** The current engine tokenizes and matches on whitespace and word boundaries, so **Chinese, Japanese, Thai, etc. are not yet supported** — they need a segmentation step (and a real tokenizer for accurate counts) before patterns can be applied. Contributions tackling that are very welcome, but adding raw word lists alone won't work for those languages.
 
 ## License
 

@@ -3,7 +3,7 @@ name: prompt-optimizer
 description: Optimizes user prompts by removing fluff (politeness, fillers, unnecessary context) to reduce token usage and improve clarity. Features self-learning, severity levels, whitelist, and multi-language support.
 ---
 
-# Prompt Optimizer (v1.1.0)
+# Prompt Optimizer (v1.2.0)
 
 This skill transforms verbose user queries into direct, high-signal instructions for an AI.
 
@@ -20,10 +20,14 @@ The optimizer supports 3 severity levels. Default is `normal`.
 | Level | What gets removed | Use case |
 |-------|------------------|----------|
 | `light` | Politeness, abbreviations, closing fillers | Customer-facing text, emails |
-| `normal` | Light + hesitations, intensifiers, unnecessary justifications | General prompts |
-| `aggressive` | Normal + fake power phrases, meta-comments, all parentheticals | Maximum token savings |
+| `normal` | Light + hesitations, intensifiers | General prompts (safe default) |
+| `aggressive` | Normal + fake power phrases, meta-comments, all parentheticals, **and lossy context** (unnecessary justifications) | Maximum token savings |
 
 When the user specifies a severity (e.g., "optimize light: ..."), apply only the matching categories from [clean-patterns.md](references/clean-patterns.md).
+
+**If the user does NOT specify a severity** (e.g. they just trigger the skill with no level), default to `normal` but tell them the level used and that `light` / `aggressive` are available — so they can re-run at a different level if they want.
+
+> ⚠️ **Lossy vs. pure fluff.** "Unnecessary justifications" ("it's for my boss", "c'est urgent") are **context, not noise** — they can legitimately change tone/intent. They are stripped **only** at `aggressive`, never at `normal`. Likewise, **never remove a parenthetical that contains code, identifiers, numbers, or a technical spec** (e.g. `parse the JSON (UTF-8 only)`) — only remove conversational asides.
 
 ## Whitelist
 
@@ -115,10 +119,23 @@ scripts/auto_learn.cjs decay 30
 ```
 Words not seen in 30 days get their count halved. Words that reach 0 are removed entirely.
 
+### Demote (Undo a Promotion)
+If a word was promoted by mistake and is being removed when it shouldn't be, undo it:
+```
+scripts/auto_learn.cjs demote "word"
+```
+This removes it from the auto-promoted section of `clean-patterns.md` and resets its learned stats so it won't be re-promoted on the next optimization. To guarantee it's never removed again, also add it to the whitelist.
+
 ### Usage Statistics
 To see a dashboard of habits, top removed words, and savings:
 ```
 scripts/auto_learn.cjs stats
+```
+
+### Privacy
+By default, the last 200 optimizations are stored (with their raw text) in `assets/learning_log.json` for the stats dashboard. If your prompts may contain secrets or personal data, run with history redaction — aggregate stats and token counts are still tracked, but raw prompt text is never written to disk:
+```
+PROMPT_OPTIMIZER_NO_HISTORY=1 scripts/auto_learn.cjs log "..." "..." ...
 ```
 
 ## Examples
